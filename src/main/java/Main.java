@@ -1,4 +1,6 @@
 import Exceptions.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
@@ -23,13 +25,13 @@ public class Main {
 
             switch (command) {
                 case "1":
-                    searchBook();
+                    getAvailableBooks();
                     break;
                 case "2":
-                    createBook();
+                    searchBook();
                     break;
                 case "3":
-                    getBookCount();
+                    createBook();
                     break;
                 case "4":
                     removeBook();
@@ -85,6 +87,8 @@ public class Main {
 
         try {
             Book book = libray.findBook(id);
+            Gson gson=new GsonBuilder().setPrettyPrinting().create();
+            System.out.println("A keresett könyv : "+gson.toJson(book));
         } catch (BookNotFoundException e) {
             System.out.println(e.getMessage());
         }
@@ -113,7 +117,7 @@ public class Main {
         }
     }
 
-    private static void getBookCount() {
+    private static void getAvailableBooks() {
         libray.printAllBook();
         System.out.println("könyvek száma: " + libray.getBookCount() + "");
         System.out.println("Elérhető könyvek száma: " + libray.getAvailableCount());

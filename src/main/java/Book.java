@@ -57,7 +57,8 @@ public class Book {
     }
 
     public boolean getElerheto() {
-        return elerheto;
+
+        return this.keszlet>0;
     }
 
     public Book setElerheto(boolean elerheto) {

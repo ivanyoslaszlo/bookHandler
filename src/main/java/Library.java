@@ -12,12 +12,10 @@ public class Library {
     List<Book> bookList = new ArrayList<>();
 
     public Library() {
-        bookList.add(new Book("Egri csillagok", "Gárdonyi Géza", "001",12));
-        bookList.add(new Book("A Pál utcai fiúk", "Molnár Ferenc", "002",34));
-        bookList.add(new Book("Tüskevár", "Fekete István", "003",123));
-        bookList.add(new Book("1984", "George Orwell", "004",32));
-        bookList.add(new Book("A kis herceg", "Antoine de Saint-Exupéry", "005",25));
-        bookList.add(new Book("Harry Potter és a bölcsek köve", "J.K. Rowling", "006",20));
+        bookList.add(new Book("Egri csillagok", "Gárdonyi Géza", "001", 2));
+        bookList.add(new Book("A Pál utcai fiúk", "Molnár Ferenc", "002", 1));
+        bookList.add(new Book("Tüskevár", "Fekete István", "003", 3));
+
         updateDatabase();
 
     }
@@ -34,13 +32,13 @@ public class Library {
         if (book.getCim() == null || book.getCim().isEmpty()) {
             throw new BookMissingTitleException();
         }
-        if (book.getAzonositoKod().isBlank()){
+        if (book.getAzonositoKod().isBlank()) {
             throw new BookMissingIdException();
         }
-        if (book.getSzerzo().isBlank()){
+        if (book.getSzerzo().isBlank()) {
             throw new BookAuthorMissingException();
         }
-        if (book.getKeszlet()<=0){
+        if (book.getKeszlet() <= 0) {
             throw new BookStockMissingException();
 
         }
@@ -60,7 +58,7 @@ public class Library {
 
     public Book findBook(String searchedBook) throws BookNotFoundException {
 
-       return bookList.stream().filter(n->n.getAzonositoKod().equals(searchedBook))
+        return bookList.stream().filter(n -> n.getAzonositoKod().equals(searchedBook))
                 .findFirst()
                 .orElseThrow(() -> new BookNotFoundException("Nem létező könyv: " + searchedBook));
 
@@ -73,7 +71,7 @@ public class Library {
     public long getAvailableCount() {
 
         return bookList.stream()
-                .filter(n->n.getElerheto())
+                .filter(Book::getElerheto)
                 .count();
 
     }
@@ -92,28 +90,51 @@ public class Library {
     }
 
     public boolean loanBook(String id) throws BookNotFoundException {
-
         Book book = findBook(id);
-        if (book != null && book.getElerheto()) {
-            book.setElerheto(false);
+
+
+        if (book == null) {
+            throw new BookNotFoundException("A könyv nem található az adatbázisban: " + id);
+        }
+
+
+        if (book.getKeszlet() > 0 && book.getElerheto()) {
+
+
+            int ujKeszlet = book.getKeszlet() - 1;
+            book.setKeszlet(ujKeszlet);
+
+
+            if (ujKeszlet == 0) {
+                book.setElerheto(false);
+            }
+
             updateDatabase();
             return true;
         }
-        return false;
 
+
+        return false;
     }
 
     public boolean returnBook(String id) throws BookNotFoundException {
         Book book = findBook(id);
-        if (book != null && !book.getElerheto()) {
-            book.setElerheto(true);
-            updateDatabase();
-            return true;
 
+
+        if (book == null) {
+            throw new BookNotFoundException("Nem lehet visszahozni, mert a könyv nem létezik: " + id);
         }
-        return false;
-    }
 
+
+        int ujKeszlet = book.getKeszlet() + 1;
+        book.setKeszlet(ujKeszlet);
+
+
+        book.setElerheto(true);
+
+        updateDatabase();
+        return true;
+    }
 }
 
 

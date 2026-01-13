@@ -5,9 +5,9 @@ public class LibraryUI {
 
     public void showMenu() {
 
-        System.out.println("Könyv keressés : 1 ");
-        System.out.println("Könyv hozzáadás : 2 ");
-        System.out.println("Elérhető könyvek száma: 3");
+        System.out.println("\nElérhető könyvek megjelenitése: 1");
+        System.out.println("Könyv keressés ID alapján : 2 ");
+        System.out.println("Könyv hozzáadás : 3 ");
         System.out.println("Könyv eltávolitás: 4");
         System.out.println("Könyv kölcsönzés: 5");
         System.out.println("Könyv visszahozás: 6");
