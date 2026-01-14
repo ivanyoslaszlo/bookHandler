@@ -4,41 +4,56 @@ import com.google.gson.GsonBuilder;
 
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Library {
     List<Book> bookList = new ArrayList<>();
 
     public Library() {
-        bookList.add(new Book("Egri csillagok", "Gárdonyi Géza", "001", 2));
-        bookList.add(new Book("A Pál utcai fiúk", "Molnár Ferenc", "002", 1));
-        bookList.add(new Book("Tüskevár", "Fekete István", "003", 3));
+        Path path=Path.of("books.json");
 
-        updateDatabase();
+        if  (!Files.exists(path)){
+            try {
+                Files.createFile(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            bookList.add(new Book("Egri csillagok", "Gárdonyi Géza", "001", 2));
+            bookList.add(new Book("A Pál utcai fiúk", "Molnár Ferenc", "002", 1));
+            bookList.add(new Book("Tüskevár", "Fekete István", "003", 2));
+
+            updateDatabase();
+        }
+        else{
+            bookList= FileHandling.loadDatabase();
+        }
+
 
     }
 
+
     public void updateDatabase() {
         try {
-            FileSave.saveBook(bookList);
+            FileHandling.saveBook(bookList);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public boolean addBook(Book book) throws BookMissingTitleException, BookMissingIdException, BookAuthorMissingException, BookStockMissingException {
-        if (book.getCim() == null || book.getCim().isEmpty()) {
+        if (book.getTitle() == null || book.getTitle().isEmpty()) {
             throw new BookMissingTitleException();
         }
-        if (book.getAzonositoKod().isBlank()) {
+        if (book.getID().isBlank()) {
             throw new BookMissingIdException();
         }
-        if (book.getSzerzo().isBlank()) {
+        if (book.getAuthor().isBlank()) {
             throw new BookAuthorMissingException();
         }
-        if (book.getKeszlet() <= 0) {
+        if (book.getStock() <= 0) {
             throw new BookStockMissingException();
 
         }
@@ -49,18 +64,18 @@ public class Library {
 
     public String removeBook(Book book) {
 
-        String cim = book.getCim();
+        String cim = book.getTitle();
         bookList.remove(book);
         updateDatabase();
-        return cim + " törölve lett !";
+        return cim + " deleted !";
 
     }
 
     public Book findBook(String searchedBook) throws BookNotFoundException {
 
-        return bookList.stream().filter(n -> n.getAzonositoKod().equals(searchedBook))
+        return bookList.stream().filter(n -> n.getID().equals(searchedBook))
                 .findFirst()
-                .orElseThrow(() -> new BookNotFoundException("Nem létező könyv: " + searchedBook));
+                .orElseThrow(() -> new BookNotFoundException("This book doesn't exist.: " + searchedBook));
 
     }
 
@@ -71,14 +86,14 @@ public class Library {
     public long getAvailableCount() {
 
         return bookList.stream()
-                .filter(Book::getElerheto)
+                .filter(Book::getAvailable)
                 .count();
 
     }
 
     public void printAllBook() {
         if (bookList.isEmpty()) {
-            System.out.println("A könyvtár üres");
+            System.out.println("The library is empty");
             return;
         }
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -89,24 +104,26 @@ public class Library {
 
     }
 
-    public boolean loanBook(String id) throws BookNotFoundException {
+    public boolean loanBook(String id) throws BookNotFoundException, BookStockMissingException {
         Book book = findBook(id);
 
 
         if (book == null) {
-            throw new BookNotFoundException("A könyv nem található az adatbázisban: " + id);
+            throw new BookNotFoundException("Book can't be found in the database:" + id);
+        }
+        if (book.getStock()<=0){
+            throw new BookStockMissingException();
         }
 
+        if (book.getStock() > 0 && book.getAvailable()) {
 
-        if (book.getKeszlet() > 0 && book.getElerheto()) {
 
-
-            int ujKeszlet = book.getKeszlet() - 1;
-            book.setKeszlet(ujKeszlet);
+            int ujKeszlet = book.getStock() - 1;
+            book.setStock(ujKeszlet);
 
 
             if (ujKeszlet == 0) {
-                book.setElerheto(false);
+                book.setAvailable(false);
             }
 
             updateDatabase();
@@ -117,20 +134,21 @@ public class Library {
         return false;
     }
 
-    public boolean returnBook(String id) throws BookNotFoundException {
+    public boolean returnBook(String id) throws BookNotFoundException, BookMaxStockError {
         Book book = findBook(id);
 
-
         if (book == null) {
-            throw new BookNotFoundException("Nem lehet visszahozni, mert a könyv nem létezik: " + id);
+            throw new BookNotFoundException("Can't be returned it doesen't exist: " + id);
         }
 
 
-        int ujKeszlet = book.getKeszlet() + 1;
-        book.setKeszlet(ujKeszlet);
+        if (book.getStock() >= book.getMaxStock()) {
+            throw new BookMaxStockError();
+        }
 
-
-        book.setElerheto(true);
+        int ujKeszlet = book.getStock() + 1;
+        book.setStock(ujKeszlet);
+        book.setAvailable(true);
 
         updateDatabase();
         return true;

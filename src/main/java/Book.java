@@ -2,74 +2,79 @@
 
 public class Book {
 
-    private String cim;
-    private String szerzo;
-    private String azonositoKod;
-    private int keszlet;
-    private boolean elerheto = true;
+    private String title;
+    private String author;
+    private String ID;
+    private int stock;
+    private int maxStock;
+    private boolean isAvailable = true;
 
 
     public Book() {
     }
-    public Book(String cim, String szerzo, String azonositoKod,int keszlet) {
-        this.cim = cim;
-        this.szerzo = szerzo;
-        this.azonositoKod = azonositoKod;
-        this.keszlet=keszlet;
-        this.elerheto = elerheto;
-    }
-    //region setter_getter
-
-    public int getKeszlet() {
-        return keszlet;
+    public Book(String title, String author, String ID, int stock) {
+        this.title = title;
+        this.author = author;
+        this.ID = ID;
+        this.stock = stock;
+        this.maxStock = stock;
+        this.isAvailable = true;
     }
 
-    public Book setKeszlet(int keszlet) {
-        this.keszlet = keszlet;
+
+    public int getStock() {
+        return stock;
+    }
+    public int getMaxStock() {
+        return maxStock;
+    }
+
+    public Book setStock(int stock) {
+        this.stock = stock;
         return this;
     }
 
-    public String getCim() {
-        return cim;
+    public String getTitle() {
+        return title;
     }
 
-    public Book setCim(String cim) {
-        this.cim = cim;
+    public Book setTitle(String title) {
+        this.title = title;
         return this;
     }
 
-    public String getSzerzo() {
-        return szerzo;
+    public String getAuthor() {
+        return author;
     }
 
-    public Book setSzerzo(String szerzo) {
-        this.szerzo = szerzo;
+    public Book setAuthor(String author) {
+        this.author = author;
         return this;
     }
 
-    public String getAzonositoKod() {
-        return azonositoKod;
+    public String getID() {
+        return ID;
     }
 
-    public Book setAzonositoKod(String azonositoKod) {
-        this.azonositoKod = azonositoKod;
+    public Book setID(String ID) {
+        this.ID = ID;
         return this;
     }
 
-    public boolean getElerheto() {
+    public boolean getAvailable() {
 
-        return this.keszlet>0;
+        return this.stock >0;
     }
 
-    public Book setElerheto(boolean elerheto) {
-        this.elerheto = elerheto;
+    public Book setAvailable(boolean available) {
+        this.isAvailable = available;
         return this;
     }
-    //endregion
+
 
 
     @Override
     public String toString() {
-        return cim + " " + szerzo + " " + azonositoKod + " " + elerheto + "\n";
+        return title + " " + author + " " + ID + " " + isAvailable + "\n";
     }
 }

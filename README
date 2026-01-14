@@ -1,0 +1,20 @@
+#  Library Management System -- Console app
+
+
+##  Key Features
+
+- Inventory Management: Add, remove, and list books with real-time stock tracking.
+- Search: Find books instantly by their unique ID.
+- Lending System: - Automated stock reduction upon loaning.
+ - Automatic availability status updates (sets to 'unavailable' when stock hits 0).
+- Data Persistence: Automatically saves all changes to a `books.json` file using the Google GSON library.
+-  Error Handling: Custom exceptions ensure that books cannot be added without a title, author, or ID.
+
+
+##  Installation & Usage
+
+1. Clone the repository: git clone https://github.com/ivanyoslaszlo/bookHandler.git
+
+2. Run the Main.java class from your favorite IDE (IntelliJ, Eclipse, or VS Code).
+
+
